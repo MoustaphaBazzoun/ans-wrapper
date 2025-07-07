@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ans-wrapper"
+version = "0.1.0"
+description = "A minimal ans-wrapper project"
+authors = [
+  { name = "Mousta Bazzoun", email = "bazzounmousta@gmail.com" }
+]
+requires-python = ">=3.8"
+dependencies = []
+
