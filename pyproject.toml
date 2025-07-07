@@ -10,5 +10,19 @@ authors = [
   { name = "Mousta Bazzoun", email = "bazzounmousta@gmail.com" }
 ]
 requires-python = ">=3.8"
-dependencies = []
+
+dependencies = [
+  "requests"
+]
+
+[project.optional-dependencies]
+dev = [
+  "nox",
+  "pyink",
+  "flake8",
+  "isort",
+  "mypy",
+  "pylint"
+]
+
 
