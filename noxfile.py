@@ -126,3 +126,15 @@ def build_and_publish(session):
         f"{TESTPYPI_TOKEN}",
         "dist/*",
     )
+
+# Testing ---------------------------------------------------------------------
+
+@nox.session
+def run_tests(session):
+    session.install("pytest")
+    
+    # Install Package in editable mode
+    session.install("-e", ".")
+
+    # Run pytest
+    session.run("pytest")
