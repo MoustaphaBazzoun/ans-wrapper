@@ -1,0 +1,14 @@
+Future Functionalities:
+- Be able to get the ANS-ID of companies
+- Be able to create economic groups (group companies by ID)
+
+Endpoints:
+- Beneficiários
+- Financial Reports
+
+Possible Functionalities
+- Company Data Functionality:
+  - Instantiate a list of companies, then:
+    - Plot number of beneficiaries over a time range
+    - make quick snapshot comparison between them
+  - Get a summary of all the data provided by this company
