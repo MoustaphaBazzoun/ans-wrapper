@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ans-wrapper"
-version = "0.1.0"
+version = "0.1.1"
 description = "A minimal ans-wrapper project"
 authors = [
   { name = "Mousta Bazzoun", email = "bazzounmousta@gmail.com" }
@@ -22,7 +22,11 @@ dev = [
   "flake8",
   "isort",
   "mypy",
-  "pylint"
+  "pylint",
+  "python-dotenv",
+  "pytest",
+  "sphinx"
 ]
 
-
+[tool.black]
+line-length = 80
