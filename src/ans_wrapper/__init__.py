@@ -1,1 +1,1 @@
-from ans_wrapper.core import *
+from ans_wrapper.beneficiarios import Beneficiarios

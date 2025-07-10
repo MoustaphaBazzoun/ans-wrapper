@@ -1,3 +1,6 @@
+from enum import Enum
+from typing import Literal
+
 BRAZILIAN_STATE_CODES = [
     "AC",  # Acre
     "AL",  # Alagoas
@@ -25,6 +28,77 @@ BRAZILIAN_STATE_CODES = [
     "SC",  # Santa Catarina
     "SP",  # São Paulo
     "SE",  # Sergipe
-    "TO"   # Tocantins
+    "TO",  # Tocantins
 ]
 
+# TODO: Maybe use enum?
+# Type with all the Country's States
+STATE_CODES = Literal[
+    "AC",
+    "AL",
+    "AP",
+    "AM",
+    "BA",
+    "CE",
+    "DF",
+    "ES",
+    "GO",
+    "MA",
+    "MT",
+    "MS",
+    "MG",
+    "PA",
+    "PB",
+    "PR",
+    "PE",
+    "PI",
+    "RJ",
+    "RN",
+    "RS",
+    "RO",
+    "RR",
+    "SC",
+    "SP",
+    "SE",
+    "TO",
+]
+
+
+# TODO: Trying this new way of declaring constants, maybe I will change it
+class States(Enum):
+    AC = ("Acre", "Norte")
+    AL = ("Alagoas", "Nordeste")
+    AP = ("Amapá", "Norte")
+    AM = ("Amazonas", "Norte")
+    BA = ("Bahia", "Nordeste")
+    CE = ("Ceará", "Nordeste")
+    DF = ("Distrito Federal", "Centro-Oeste")
+    ES = ("Espírito Santo", "Sudeste")
+    GO = ("Goiás", "Centro-Oeste")
+    MA = ("Maranhão", "Nordeste")
+    MT = ("Mato Grosso", "Centro-Oeste")
+    MS = ("Mato Grosso do Sul", "Centro-Oeste")
+    MG = ("Minas Gerais", "Sudeste")
+    PA = ("Pará", "Norte")
+    PB = ("Paraíba", "Nordeste")
+    PR = ("Paraná", "Sul")
+    PE = ("Pernambuco", "Nordeste")
+    PI = ("Piauí", "Nordeste")
+    RJ = ("Rio de Janeiro", "Sudeste")
+    RN = ("Rio Grande do Norte", "Nordeste")
+    RS = ("Rio Grande do Sul", "Sul")
+    RO = ("Rondônia", "Norte")
+    RR = ("Roraima", "Norte")
+    SC = ("Santa Catarina", "Sul")
+    SP = ("São Paulo", "Sudeste")
+    SE = ("Sergipe", "Nordeste")
+    TO = ("Tocantins", "Norte")
+
+    def __init__(self, full_name, region):
+        self.full_name = full_name
+        self.region = region
+
+
+URL_BENEFICIARIOS = "https://dadosabertos.ans.gov.br/FTP/PDA/informacoes_consolidadas_de_beneficiarios-024/"
+
+URL = "https://dadosabertos.ans.gov.br/FTP/"
