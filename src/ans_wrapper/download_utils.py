@@ -1,4 +1,5 @@
 import requests
+import os
 
 TEST_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/informacoes_consolidadas_de_beneficiarios-024/202505/pda-024-icb-AC-2025_05.zip"
 
@@ -9,9 +10,6 @@ def download_archive(url):
     response.raise_for_status()
 
 
-import os
-
-import requests
 
 
 def download_zip(url, output_dir="ans_downloads"):
@@ -31,6 +29,9 @@ def download_zip(url, output_dir="ans_downloads"):
 
     print(f"ZIP file saved at: {filepath}")
     return filepath
+
+def unzip_folder():
+    pass
 
 
 print("inicio")
