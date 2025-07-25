@@ -24,7 +24,7 @@ def parse_url_links(url: str) -> list:
 
 
 def get_link_type():
-    return
+    return 
 
 
 if __name__ == "__main__":

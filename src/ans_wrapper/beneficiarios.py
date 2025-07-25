@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 
 from ans_wrapper.beneficiarios_utils import parse_url_links
+from ans_wrapper.download_utils import download_and_extract_csv
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 # Concept:
@@ -18,6 +19,7 @@ BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 class Beneficiarios:
     ENDPOINT = "informacoes_consolidadas_de_beneficiarios-024/"
     BENEFICIARIOS_URL = BASE_URL + ENDPOINT
+    FILENAME = "pda-024-icb-{state_sigla}-{year}_{month}.zip"
 
     def __init__(self):
         self.available_months = self._fetch_available_months()
@@ -27,8 +29,8 @@ class Beneficiarios:
         Fetches the list of available months from the beneficiários folder.
 
         Returns:
-            List[str]: A sorted list of strings in the format 'YYYYMM',
-                       representing each available monthly folder on the server.
+                List[str]: A sorted list of strings in the format 'YYYYMM',
+                                   representing each available monthly folder on the server.
         """
         # Fetching the page data
         list_of_links = parse_url_links(self.BENEFICIARIOS_URL)
@@ -49,32 +51,55 @@ class Beneficiarios:
         if not self.available_months:
             return "No data available"
 
-        start = (datetime
-                 .strptime(self.available_months[0], "%Y%m")
-                 .strftime("%b %Y"))
-        
-        end = (datetime
-               .strptime(self.available_months[-1], "%Y%m")
-               .strftime("%b %Y"))
+        start = datetime.strptime(self.available_months[0], "%Y%m").strftime(
+            "%b %Y"
+        )
+
+        end = datetime.strptime(self.available_months[-1], "%Y%m").strftime(
+            "%b %Y"
+        )
 
         return f"data available from {start} to {end}"
-    
+
     @property
     def info(self) -> str:
-	    return (
-	        f"Beneficiários data available:\n"
-	        f"📅 {self.date_range}\n"
-	        f"📦 {len(self.available_months)} months available\n"
-	        f"🔗 Source: {self.BENEFICIARIOS_URL}"
-	    )
-	
-	
+        return (
+            f"Beneficiários data available:\n"
+            f"📅 {self.date_range}\n"
+            f"📦 {len(self.available_months)} months available\n"
+            f"🔗 Source: {self.BENEFICIARIOS_URL}"
+        )
+
+    def hello():
+        pass
+
+    def build_dataset(
+            self,
+            target_date: str,
+            state: str,
+            start = None,
+            end = None,
+            range = None
+            ) -> pd.DataFrame:
+        """Create a dataset using customized configs."""
+        cur_url = self.BENEFICIARIOS_URL + target_date + "/" + self.FILENAME.format(state_sigla=state)
+        print(cur_url)
+        
+    def download_raw_data(self, states: list, dates: list):
+        file_paths = []
+        for state in states:
+            for date in dates:
+                year, month = date[:4], date[4:]
+                cur_file_name = self.FILENAME.format(state_sigla=state, year=year, month=month)
+                cur_file_path = date + "/" + cur_file_name
+                file_paths.append(cur_file_path)
+        
+        for urls in file_paths:
+            cur_url = self.BENEFICIARIOS_URL + urls
+            print(cur_url)
+            download_and_extract_csv(cur_url)
 
 
-def build_dataset(
-    start,
-    end,
-    range,
-) -> pd.DataFrame:
-    """Create a dataset using customized configs."""
-    pass
+if __name__ == "__main__":
+    bf = Beneficiarios()
+    bf.download_raw_data(["AC", "AM"], ["202401", "202404"])
