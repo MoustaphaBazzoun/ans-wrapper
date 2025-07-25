@@ -16,6 +16,7 @@ BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 # region, time_interval,
 
 
+
 class Beneficiarios:
     ENDPOINT = "informacoes_consolidadas_de_beneficiarios-024/"
     BENEFICIARIOS_URL = BASE_URL + ENDPOINT
@@ -85,6 +86,5 @@ class Beneficiarios:
         cur_url = self.BENEFICIARIOS_URL + target_date + "/" + self.FILENAME.format(state_sigla=state)
         print(cur_url)
         
-
-                                                                                
-
+    def download_raw_data(self, states, dates):
+        pass
