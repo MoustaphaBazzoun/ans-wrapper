@@ -9,18 +9,17 @@ import pandas as pd
 import requests
 
 from ans_wrapper.beneficiarios_utils import parse_url_links
-from ans_wrapper.download_utils import *
+from ans_wrapper.download_utils import download_and_extract_csv
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 # Concept:
 # region, time_interval,
 
 
-
 class Beneficiarios:
     ENDPOINT = "informacoes_consolidadas_de_beneficiarios-024/"
     BENEFICIARIOS_URL = BASE_URL + ENDPOINT
-    FILENAME = "da-024-icb-{state_sigla}-2024_09.zip"
+    FILENAME = "pda-024-icb-{state_sigla}-{year}_{month}.zip"
 
     def __init__(self):
         self.available_months = self._fetch_available_months()
@@ -86,5 +85,21 @@ class Beneficiarios:
         cur_url = self.BENEFICIARIOS_URL + target_date + "/" + self.FILENAME.format(state_sigla=state)
         print(cur_url)
         
-    def download_raw_data(self, states, dates):
-        pass
+    def download_raw_data(self, states: list, dates: list):
+        file_paths = []
+        for state in states:
+            for date in dates:
+                year, month = date[:4], date[4:]
+                cur_file_name = self.FILENAME.format(state_sigla=state, year=year, month=month)
+                cur_file_path = date + "/" + cur_file_name
+                file_paths.append(cur_file_path)
+        
+        for urls in file_paths:
+            cur_url = self.BENEFICIARIOS_URL + urls
+            print(cur_url)
+            download_and_extract_csv(cur_url)
+
+
+if __name__ == "__main__":
+    bf = Beneficiarios()
+    bf.download_raw_data(["AC", "AM"], ["202401", "202404"])

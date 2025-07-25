@@ -7,7 +7,7 @@ import zipfile
 import requests
 
 
-def download_zip(url, output_dir="ans_downloads"):
+def download_zip(url: str, output_dir="ans_downloads"):
     """
     Download a ZIP file from the web and save it locally in the specified folder.
 
