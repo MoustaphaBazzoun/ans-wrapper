@@ -61,8 +61,7 @@ class Beneficiarios:
         states: Union[STATE_CODES, List[STATE_CODES]],
         target_date: str = None,
         start=None,
-        end=None,
-        range=None
+        end=None
         ) -> pd.DataFrame:
         """Create a dataset using customized configs."""
         # Checking date args 
@@ -146,6 +145,19 @@ def generate_month_range(start: str, end: str) -> list[str]:
         cur += relativedelta(months=1)
     
     return date_range
+
+
+def concat_datasets(list_of_datasets):
+    output_file = "combined_dataset.csv"
+    first_chunk = True  # Track if it's the first chunk being written
+
+    for file_path in list_of_datasets:
+        print(f"Processing {file_path}...")
+
+        for chunk in pd.read_csv(file_path, chunksize=100_000):
+            mode = 'w' if first_chunk else 'a'
+            chunk.to_csv(output_file, mode=mode, header=first_chunk, index=False)
+            first_chunk = False
 
 
 if __name__ == "__main__":
