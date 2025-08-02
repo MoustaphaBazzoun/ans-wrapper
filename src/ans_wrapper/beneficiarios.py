@@ -14,9 +14,8 @@ from ans_wrapper.enums import STATE_CODES, BRAZILIAN_STATE_CODES
 from ans_wrapper.beneficiarios_utils import parse_url_links
 from ans_wrapper.download_utils import download_and_extract_csv
 
+
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
-# Concept:
-# region, time_interval,
 
 
 class Beneficiarios:
