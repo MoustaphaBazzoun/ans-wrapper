@@ -1,3 +1,6 @@
+"""Main Module to download financial data via ANS codes."""
+
+from ans_wrapper.download_utils import download_and_extract_csv
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 
@@ -11,14 +14,28 @@ class DemonstracoesContabeis:
     FILENAME = "{quarter}T{year}.zip"
 
     def download_info(self,
-                      ans_code=None,
                       year=None,
                       quarter=None):
-        """Download Financial Info for a given ANS code"""
+        """Download Financial Info for a given quarter"""
 
         filename = self.FILENAME.format(quarter=quarter, year=year)
-        request_url = self.DEM_CONTABEIS_ENDPOINT + str(year) + filename
 
+        request_url = self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
+
+        download_and_extract_csv(request_url)
+
+    
+
+
+
+if __name__ == "__main__":
+    dem = DemonstracoesContabeis()
+
+    df = dem.download_info(
+        ans_code=None,
+        year="2025",
+        quarter="1"
+    )
 
 
 
