@@ -19,11 +19,12 @@ class DemonstracoesContabeis:
         """Download Financial Info for a given quarter"""
 
         filename = self.FILENAME.format(quarter=quarter, year=year)
+
         request_url = self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
 
         download_and_extract_csv(request_url)
 
-        print("done")
+    
 
 
 

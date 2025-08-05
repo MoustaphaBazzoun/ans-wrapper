@@ -1,1 +1,2 @@
 from ans_wrapper.beneficiarios import Beneficiarios
+from ans_wrapper.demonstracoes_contabeis import DemonstracoesContabeis
