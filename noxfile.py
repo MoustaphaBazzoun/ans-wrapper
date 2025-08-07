@@ -1,3 +1,4 @@
+"""Nox sessions for automated tasks"""
 import os
 
 import nox
