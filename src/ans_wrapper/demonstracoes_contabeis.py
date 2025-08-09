@@ -1,5 +1,8 @@
 """Main Module to download financial data via ANS codes."""
 
+from typing import List, Union, Optional
+import pandas as pd
+
 from ans_wrapper.download_utils import download_and_extract_csv
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
@@ -24,6 +27,78 @@ class DemonstracoesContabeis:
 
         download_and_extract_csv(request_url)
 
+    def get_info(self, 
+                 quarters: Union[str, List[str]],
+                 company: Optional[Union[str, List[str]]] = None) -> pd.DataFrame:
+        """
+        Download and filter financial data for specified companies and quarters.
+        
+        Args:
+            quarters: Quarter(s) in format "1T2024", "2T2023", etc.
+            company: ANS code(s) to filter by. If None, returns full dataset.
+            
+        Returns:
+            pd.DataFrame: Filtered financial data
+        """
+        # Parse quarters parameter to ensure it's a list
+        if isinstance(quarters, str):
+            quarters_list = [quarters]
+        else:
+            quarters_list = quarters
+        
+        # Parse company parameter
+        if company is None:
+            company_list = None
+        elif isinstance(company, str):
+            company_list = [company]
+        else:
+            company_list = company
+        
+        # Download CSV files for each quarter
+        csv_paths = []
+        for quarter in quarters_list:
+            # Extract year and quarter number from format like "1T2024"
+            if 'T' not in quarter:
+                raise ValueError(f"Invalid quarter format: {quarter}. Expected format: '1T2024'")
+            
+            quarter_num, year = quarter.split('T')
+            filename = self.FILENAME.format(quarter=quarter_num, year=year)
+            request_url = self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
+            
+            try:
+                csv_path = download_and_extract_csv(request_url)
+                csv_paths.append(csv_path)
+            except Exception as e:
+                print(f"Failed to download data for {quarter}: {e}")
+                continue
+        
+        if not csv_paths:
+            raise ValueError("No data could be downloaded for the specified quarters")
+        
+        # Load and combine all CSV files
+        dataframes = []
+        for csv_path in csv_paths:
+            # Use semicolon separator and handle quoted values
+            df = pd.read_csv(csv_path, sep=';', quotechar='"')
+            dataframes.append(df)
+        
+        # Combine all dataframes
+        combined_df = pd.concat(dataframes, ignore_index=True)
+        
+        # Filter by company codes if specified
+        if company_list is not None:
+            if 'REG_ANS' not in combined_df.columns:
+                raise ValueError("REG_ANS column not found in the dataset")
+            
+            filtered_df = combined_df[combined_df['REG_ANS'].isin(company_list)]
+            
+            if filtered_df.empty:
+                print(f"Warning: No data found for companies {company_list}")
+            
+            return filtered_df
+        
+        return combined_df
+
     
 
 
@@ -31,11 +106,15 @@ class DemonstracoesContabeis:
 if __name__ == "__main__":
     dem = DemonstracoesContabeis()
 
-    df = dem.download_info(
-        ans_code=None,
-        year="2025",
-        quarter="1"
-    )
+    # Example usage of get_info function
+    # Get full dataset for specific quarters
+    df_full = dem.get_info(quarters="1T2025", company=None)
+    print("Full dataset shape:", df_full.shape)
+    print("Columns:", list(df_full.columns))
+    
+    # Get filtered dataset for specific companies (using real company codes)
+    df_filtered = dem.get_info(quarters="1T2025", company=["000477", "000515"])
+    print("Filtered dataset shape:", df_filtered.shape)
 
 
 
