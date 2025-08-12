@@ -1,10 +1,7 @@
-import ans_wrapper as ans
+import requests
+import pandas as pd
 
-beneficiarios = ans.Beneficiarios()
+URL = "https://www.ans.gov.br/operadoras-entity/v1/operadoras"
 
-df = beneficiarios.build_dataset(
-  target_date="202504",
-  state="AC"
-)
-
-print(df.head())
+r = requests.get(URL)
+print(r.json())

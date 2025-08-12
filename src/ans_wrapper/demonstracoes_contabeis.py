@@ -29,13 +29,13 @@ class DemonstracoesContabeis:
 
     def get_info(self, 
                  quarters: Union[str, List[str]],
-                 company: Optional[Union[str, List[str]]] = None) -> pd.DataFrame:
+                 company: Optional[Union[str, int, List[Union[str, int]]]] = None) -> pd.DataFrame:
         """
         Download and filter financial data for specified companies and quarters.
         
         Args:
             quarters: Quarter(s) in format "1T2024", "2T2023", etc.
-            company: ANS code(s) to filter by. If None, returns full dataset.
+            company: ANS code(s) to filter by (str, int, or list). If None, returns full dataset.
             
         Returns:
             pd.DataFrame: Filtered financial data
@@ -46,13 +46,14 @@ class DemonstracoesContabeis:
         else:
             quarters_list = quarters
         
-        # Parse company parameter
+        # Parse company parameter and convert to integers
         if company is None:
             company_list = None
-        elif isinstance(company, str):
-            company_list = [company]
+        elif isinstance(company, (str, int)):
+            company_list = [int(company)]
         else:
-            company_list = company
+            # Convert all elements to integers
+            company_list = [int(c) for c in company]
         
         # Download CSV files for each quarter
         csv_paths = []
@@ -90,6 +91,16 @@ class DemonstracoesContabeis:
             if 'REG_ANS' not in combined_df.columns:
                 raise ValueError("REG_ANS column not found in the dataset")
             
+            # idk, I'm adding this just in case REG_ANS is not an integer
+            combined_df['REG_ANS'] = combined_df['REG_ANS'].astype(int)
+
+            # Check if all the company codes the user wants are on the dataset
+            missing_codes = [code for code in company_list
+                             if code not in combined_df['REG_ANS'].unique()]
+
+            if missing_codes:
+                raise ValueError(f"Company code(s) not found in dataset: {missing_codes}")
+
             filtered_df = combined_df[combined_df['REG_ANS'].isin(company_list)]
             
             if filtered_df.empty:
@@ -98,10 +109,7 @@ class DemonstracoesContabeis:
             return filtered_df
         
         return combined_df
-
     
-
-
 
 if __name__ == "__main__":
     dem = DemonstracoesContabeis()
@@ -113,7 +121,8 @@ if __name__ == "__main__":
     print("Columns:", list(df_full.columns))
     
     # Get filtered dataset for specific companies (using real company codes)
-    df_filtered = dem.get_info(quarters="1T2025", company=["000477", "000515"])
+    # Can use strings, integers, or mixed
+    df_filtered = dem.get_info(quarters="1T2025", company=["477", 515])
     print("Filtered dataset shape:", df_filtered.shape)
 
 
