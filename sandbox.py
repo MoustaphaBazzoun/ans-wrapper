@@ -1,7 +1,5 @@
-import requests
-import pandas as pd
+from tqdm import tqdm
+import time
 
-URL = "https://www.ans.gov.br/operadoras-entity/v1/operadoras"
-
-r = requests.get(URL)
-print(r.json())
+for i in tqdm(range(100)):
+    time.sleep(0.1)  # simulate work

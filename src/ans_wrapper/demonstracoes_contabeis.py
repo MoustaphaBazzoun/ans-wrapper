@@ -12,8 +12,6 @@ BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 class DemonstracoesContabeis:
     ENDPOINT = "demonstracoes_contabeis/"
     DEM_CONTABEIS_ENDPOINT = BASE_URL + ENDPOINT
-
-    FILENAME = "pda-024-icb-{state_sigla}-{year}_{month}.zip"
     FILENAME = "{quarter}T{year}.zip"
 
     def download_info(self,
