@@ -1,29 +1,31 @@
-"""Main Module to download financial data via ANS codes."""
+"""download financial data of any healthcare company registered in ANS .
 
-from typing import List, Union, Optional
+This module provides functionality to download and process financial statements
+from the Brazilian National Health Agency (ANS). It provides two statements: 
+Balance sheets and income statements.
+"""
+
+from typing import List, Union, Optional, Literal
 import pandas as pd
 
 from ans_wrapper.download_utils import download_and_extract_csv
 
+# Base URL for ANS open data portal
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 
+# Example URL format:
 # "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2021/4T2021.zip"
 
 class DemonstracoesContabeis:
-    ENDPOINT = "demonstracoes_contabeis/"
-    DEM_CONTABEIS_ENDPOINT = BASE_URL + ENDPOINT
-    FILENAME = "{quarter}T{year}.zip"
-
-    def download_info(self,
-                      year=None,
-                      quarter=None):
-        """Download Financial Info for a given quarter"""
-
-        filename = self.FILENAME.format(quarter=quarter, year=year)
-
-        request_url = self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
-
-        download_and_extract_csv(request_url)
+    """A class to download and process financial statements from ANS.
+    
+    This class provides methods to download quarterly financial data for health
+    plan operators and filter the data by specific companies using ANS codes.
+    """
+    
+    ENDPOINT: str = "demonstracoes_contabeis/"
+    DEM_CONTABEIS_ENDPOINT: str = BASE_URL + ENDPOINT
+    FILENAME: str = "{quarter}T{year}.zip"
 
     def get_info(self, 
                  quarters: Union[str, List[str]],
@@ -31,12 +33,23 @@ class DemonstracoesContabeis:
         """
         Download and filter financial data for specified companies and quarters.
         
+        This method downloads CSV files for the specified quarters, combines them,
+        and optionally filters by company ANS codes. The data is expected to have
+        a 'REG_ANS' column containing the ANS registration codes.
+        
         Args:
-            quarters: Quarter(s) in format "1T2024", "2T2023", etc.
-            company: ANS code(s) to filter by (str, int, or list). If None, returns full dataset.
+            quarters: Quarter(s) in format "1T2024", "2T2023", etc. Can be a single
+                     string or a list of strings.
+            company: ANS code(s) to filter by. Can be a single code (str/int) or a
+                    list of codes. If None, returns the full dataset for all companies.
             
         Returns:
-            pd.DataFrame: Filtered financial data
+            pd.DataFrame: Filtered financial data with columns including REG_ANS
+            
+        Raises:
+            ValueError: If quarter format is invalid, no data could be downloaded,
+                       REG_ANS column is missing, or company codes are not found
+            Exception: If CSV reading or processing fails
         """
         # Parse quarters parameter to ensure it's a list
         if isinstance(quarters, str):
@@ -45,13 +58,13 @@ class DemonstracoesContabeis:
             quarters_list = quarters
         
         # Parse company parameter and convert to integers
-        if company is None:
-            company_list = None
-        elif isinstance(company, (str, int)):
-            company_list = [int(company)]
-        else:
-            # Convert all elements to integers
-            company_list = [int(c) for c in company]
+        company_list = None
+        if company is not None:
+            if isinstance(company, (str, int)):
+                company_list = [int(company)]
+            else:
+                # Convert all elements to integers
+                company_list = [int(c) for c in company]
         
         # Download CSV files for each quarter
         csv_paths = []
@@ -77,9 +90,16 @@ class DemonstracoesContabeis:
         # Load and combine all CSV files
         dataframes = []
         for csv_path in csv_paths:
-            # Use semicolon separator and handle quoted values
-            df = pd.read_csv(csv_path, sep=';', quotechar='"')
-            dataframes.append(df)
+            try:
+                # Use semicolon separator and handle quoted values
+                df = pd.read_csv(csv_path, sep=';', quotechar='"')
+                dataframes.append(df)
+            except Exception as e:
+                print(f"Failed to read CSV file {csv_path}: {e}")
+                continue
+        
+        if not dataframes:
+            raise ValueError("No CSV files could be successfully read")
         
         # Combine all dataframes
         combined_df = pd.concat(dataframes, ignore_index=True)
@@ -92,9 +112,9 @@ class DemonstracoesContabeis:
             # idk, I'm adding this just in case REG_ANS is not an integer
             combined_df['REG_ANS'] = combined_df['REG_ANS'].astype(int)
 
-            # Check if all the company codes the user wants are on the dataset
-            missing_codes = [code for code in company_list
-                             if code not in combined_df['REG_ANS'].unique()]
+            # Check if all the company codes the user wants are in the dataset
+            available_codes = combined_df['REG_ANS'].unique()
+            missing_codes = [code for code in company_list if code not in available_codes]
 
             if missing_codes:
                 raise ValueError(f"Company code(s) not found in dataset: {missing_codes}")
@@ -107,22 +127,34 @@ class DemonstracoesContabeis:
             return filtered_df
         
         return combined_df
-    
 
-if __name__ == "__main__":
-    dem = DemonstracoesContabeis()
-
-    # Example usage of get_info function
-    # Get full dataset for specific quarters
-    df_full = dem.get_info(quarters="1T2025", company=None)
-    print("Full dataset shape:", df_full.shape)
-    print("Columns:", list(df_full.columns))
-    
-    # Get filtered dataset for specific companies (using real company codes)
-    # Can use strings, integers, or mixed
-    df_filtered = dem.get_info(quarters="1T2025", company=["477", 515])
-    print("Filtered dataset shape:", df_filtered.shape)
-
-
-
+    # def download_info(self,
+    #                   year: Optional[int] = None,
+    #                   quarter: Optional[int] = None) -> str:
+    #     """Download financial information for a given quarter and year.
+    #     
+    #     Args:
+    #         year: The year for which to download data (e.g., 2024)
+    #         quarter: The quarter number (1-4) for which to download data
+    #         
+    #     Returns:
+    #         str: Path to the extracted CSV file
+    #         
+    #     Raises:
+    #         ValueError: If year or quarter is not provided
+    #         Exception: If download or extraction fails
+    #     """
+    #     if year is None or quarter is None:
+    #         raise ValueError("Both year and quarter must be provided")
+    #         
+    #     if not isinstance(year, int) or not isinstance(quarter, int):
+    #         raise ValueError("Year and quarter must be integers")
+    #         
+    #     if quarter < 1 or quarter > 4:
+    #         raise ValueError("Quarter must be between 1 and 4")
+    #  
+    #     filename = self.FILENAME.format(quarter=quarter, year=year)
+    #     request_url = self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
+    #  
+    #     return download_and_extract_csv(request_url)
 
