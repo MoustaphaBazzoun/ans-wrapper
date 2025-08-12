@@ -209,3 +209,4 @@ __marimo__/
 # files downloaded by the ans_wrapper package
 ans_downloads/*
 ans_datasets/*
+notebooks/ans_downloads/*

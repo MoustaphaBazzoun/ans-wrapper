@@ -3,6 +3,7 @@
 import os
 import shutil
 import zipfile
+from tqdm import tqdm
 
 import requests
 
@@ -26,11 +27,16 @@ def download_zip(url: str, output_dir="ans_downloads"):
     response = requests.get(url, stream=True)
     response.raise_for_status()
 
+    total_size = int(response.headers.get("content-length", 0))
+
     # saving it
-    with open(filepath, "wb") as f:
+    with open(filepath, "wb") as f, tqdm(
+        total=total_size, unit='B', unit_scale=True, desc=filename
+        ) as pbar:
         for chunk in response.iter_content(chunk_size=8192):
             if chunk:
                 f.write(chunk)
+                pbar.update(len(chunk))
 
     print(f"ZIP file saved at: {filepath}")
     return filepath

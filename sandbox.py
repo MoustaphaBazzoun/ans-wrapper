@@ -1,10 +1,5 @@
-import ans_wrapper as ans
+from tqdm import tqdm
+import time
 
-beneficiarios = ans.Beneficiarios()
-
-df = beneficiarios.build_dataset(
-  target_date="202504",
-  state="AC"
-)
-
-print(df.head())
+for i in tqdm(range(100)):
+    time.sleep(0.1)  # simulate work
