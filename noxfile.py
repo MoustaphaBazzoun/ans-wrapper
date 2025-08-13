@@ -1,4 +1,5 @@
 """Nox sessions for automated tasks"""
+
 import os
 
 import nox
@@ -55,7 +56,9 @@ def format(session):
     session.install("black", "isort")
     session.log(f"Working dir: {os.getcwd()}")
     session.run("isort", "src", "tests", "noxfile.py", external=True)
-    session.run("black", "src", "tests", "noxfile.py", external=True)
+    session.run(
+        "black", "--line-length=80", "src", "tests", "noxfile.py", external=True
+    )
 
 
 @nox.session
@@ -63,7 +66,15 @@ def check_formatting(session):
     """Check formatting using black and isort (non-destructive)."""
     session.install("black", "isort")
     session.run("isort", "--check", "--diff", "src", "tests", "noxfile.py")
-    session.run("black", "--check", "--diff", "src", "tests", "noxfile.py")
+    session.run(
+        "black",
+        "--check",
+        "--diff",
+        "--line-length=80",
+        "src",
+        "tests",
+        "noxfile.py",
+    )
 
 
 # Building --------------------------------------------------------------------
