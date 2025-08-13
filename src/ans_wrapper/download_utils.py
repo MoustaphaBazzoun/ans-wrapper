@@ -3,9 +3,9 @@
 import os
 import shutil
 import zipfile
-from tqdm import tqdm
 
 import requests
+from tqdm import tqdm
 
 
 def download_zip(url: str, output_dir="ans_downloads"):
@@ -20,7 +20,7 @@ def download_zip(url: str, output_dir="ans_downloads"):
 
     # getting the name of the zip file
     filename = url.split("/")[-1]
-    # the path where are storing this zip 
+    # the path where are storing this zip
     filepath = os.path.join(output_dir, filename)
 
     # downloading the zip file
@@ -31,8 +31,8 @@ def download_zip(url: str, output_dir="ans_downloads"):
 
     # saving it
     with open(filepath, "wb") as f, tqdm(
-        total=total_size, unit='B', unit_scale=True, desc=filename
-        ) as pbar:
+        total=total_size, unit="B", unit_scale=True, desc=filename
+    ) as pbar:
         for chunk in response.iter_content(chunk_size=8192):
             if chunk:
                 f.write(chunk)
@@ -70,7 +70,7 @@ def extract_csv(zip_path, temp_extract_dir="ans_downloads"):
     extracted_csv_path = os.path.join(temp_extract_dir, csv_filename)
     print(f"CSV extracted: {extracted_csv_path}")
 
-    #removing the zip file
+    # removing the zip file
     os.remove(zip_path)
 
     return extracted_csv_path
