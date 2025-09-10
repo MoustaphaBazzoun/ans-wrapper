@@ -9,7 +9,7 @@ from typing import List, Literal, Optional, Union
 
 import pandas as pd
 
-from ans_wrapper.download_utils import download_and_extract_csv
+from ..download_utils import download_and_extract_csv
 
 # Base URL for ANS open data portal
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
@@ -80,7 +80,7 @@ class DemonstracoesContabeis:
                 )
 
             quarter_num, year = quarter.split("T")
-            filename = self.FILENAME.format(quarter=quarter_num, year=year)
+            filename = self.FILENAME.format(quarter=quarter_num, year=year) 
             request_url = (
                 self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
             )
@@ -89,7 +89,7 @@ class DemonstracoesContabeis:
                 csv_path = download_and_extract_csv(request_url)
                 csv_paths.append(csv_path)
             except Exception as e:
-                print(f"Failed to download data for {quarter}: {e}")
+                print(f"Failed to download data for {quarter}: {e}") # NOTE: Maybe raise exception and interrupt function here...
                 continue
 
         if not csv_paths:
@@ -119,7 +119,7 @@ class DemonstracoesContabeis:
             if "REG_ANS" not in combined_df.columns:
                 raise ValueError("REG_ANS column not found in the dataset")
 
-            # idk, I'm adding this just in case REG_ANS is not an integer
+            # NOTE: idk, I'm adding this just in case REG_ANS is not an integer
             combined_df["REG_ANS"] = combined_df["REG_ANS"].astype(int)
 
             # Check if all the company codes the user wants are in the dataset

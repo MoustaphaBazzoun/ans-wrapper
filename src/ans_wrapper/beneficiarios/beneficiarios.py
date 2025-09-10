@@ -8,9 +8,9 @@ from typing import List, Literal, Union
 import pandas as pd
 import requests
 
-from ans_wrapper.beneficiarios_utils import parse_url_links
-from ans_wrapper.download_utils import download_and_extract_csv
-from ans_wrapper.enums import BRAZILIAN_STATE_CODES, STATE_CODES
+from .beneficiarios_utils import parse_url_links
+from ..download_utils import download_and_extract_csv
+from ..enums import BRAZILIAN_STATE_CODES, STATE_CODES
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 
@@ -48,6 +48,8 @@ class Beneficiarios:
             f"🔗 Source: {self.BENEFICIARIOS_URL}"
         )
 
+
+    # TODO: Work in Progress
     def build_dataset(
         self,
         states: Union[STATE_CODES, List[STATE_CODES]],
