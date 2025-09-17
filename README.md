@@ -9,6 +9,7 @@ Small Python wrapper around the ANS (Agência Nacional de Saúde Suplementar) op
 
 ### Installation
 
+
 ```bash
 pip install ans_wrapper
 ```
