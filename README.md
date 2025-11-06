@@ -69,10 +69,12 @@ df_filtered = dc.get_info(["1T2024", "2T2024"], company=[353889, 323140])
 
 - Beneficiários module is under development and not documented here yet.
 - Possible additions: richer validations, caching, and more friendly error messages.
+- Improve Autocomplete and Importing/Module Structure
 
 ### Development
 
 - Formatters and linters are configured via `pyproject.toml` and `noxfile.py`.
 - Run tests with `pytest` (if/when tests for this module are added).
+
 
 

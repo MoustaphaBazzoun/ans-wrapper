@@ -215,3 +215,6 @@ notebooks/ans_downloads/*
 _notes.txt
 _sandbox.py
 _sandbox.ipynb
+
+# IDE stuff
+.idea/

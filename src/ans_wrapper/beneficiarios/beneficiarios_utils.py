@@ -1,13 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+# TODO: maybe remove this in future updates?
 BENEFICIARIOS_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/informacoes_consolidadas_de_beneficiarios-024/"
-
-
-def download_zip(file_url: str):
-    """Download the zipfile"""
-    pass
-
 
 def parse_url_links(url: str) -> list:
     """Parse the paths of a given url"""
@@ -24,11 +19,10 @@ def parse_url_links(url: str) -> list:
 
 
 def get_link_type():
-    return
+    raise NotImplementedError("This function is deprecated, might be removed in future updates.")
 
 
-if __name__ == "__main__":
-    links = parse_url_links(BENEFICIARIOS_URL)
-    for link in links:
-        print(link["href"])
-        print(type(link))
+def download_zip(file_url: str):
+    """Download the zipfile"""
+    raise NotImplementedError("This function is deprecated, might be removed in future updates.")
+

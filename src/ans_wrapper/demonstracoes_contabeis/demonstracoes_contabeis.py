@@ -5,7 +5,7 @@ from the Brazilian National Health Agency (ANS). It provides two statements:
 Balance sheets and income statements.
 """
 
-from typing import List, Literal, Optional, Union
+from typing import List, Optional, Union
 
 import pandas as pd
 
@@ -119,7 +119,7 @@ class DemonstracoesContabeis:
             if "REG_ANS" not in combined_df.columns:
                 raise ValueError("REG_ANS column not found in the dataset")
 
-            # NOTE: idk, I'm adding this just in case REG_ANS is not an integer
+            # NOTE: IDK, I'm adding this just in case REG_ANS is not an integer
             combined_df["REG_ANS"] = combined_df["REG_ANS"].astype(int)
 
             # Check if all the company codes the user wants are in the dataset
@@ -142,32 +142,3 @@ class DemonstracoesContabeis:
 
         return combined_df
 
-    # def download_info(self,
-    #                   year: Optional[int] = None,
-    #                   quarter: Optional[int] = None) -> str:
-    #     """Download financial information for a given quarter and year.
-    #
-    #     Args:
-    #         year: The year for which to download data (e.g., 2024)
-    #         quarter: The quarter number (1-4) for which to download data
-    #
-    #     Returns:
-    #         str: Path to the extracted CSV file
-    #
-    #     Raises:
-    #         ValueError: If year or quarter is not provided
-    #         Exception: If download or extraction fails
-    #     """
-    #     if year is None or quarter is None:
-    #         raise ValueError("Both year and quarter must be provided")
-    #
-    #     if not isinstance(year, int) or not isinstance(quarter, int):
-    #         raise ValueError("Year and quarter must be integers")
-    #
-    #     if quarter < 1 or quarter > 4:
-    #         raise ValueError("Quarter must be between 1 and 4")
-    #
-    #     filename = self.FILENAME.format(quarter=quarter, year=year)
-    #     request_url = self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
-    #
-    #     return download_and_extract_csv(request_url)

@@ -17,7 +17,7 @@ BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 
 class Beneficiarios:
     ENDPOINT = "informacoes_consolidadas_de_beneficiarios-024/"
-    BENEFICIARIOS_URL = BASE_URL + ENDPOINT
+    __BENEFICIARIOS_URL = BASE_URL + ENDPOINT
     FILENAME = "pda-024-icb-{state_sigla}-{year}_{month}.zip"
 
     def __init__(self):
@@ -45,7 +45,7 @@ class Beneficiarios:
             f"Beneficiários data available:\n"
             f"📅 {self.date_range}\n"
             f"📦 {len(self.available_months)} months available\n"
-            f"🔗 Source: {self.BENEFICIARIOS_URL}"
+            f"🔗 Source: {self.__BENEFICIARIOS_URL}"
         )
 
 
@@ -98,7 +98,7 @@ class Beneficiarios:
 
         csv_paths = []
         for urls in file_paths:
-            cur_url = self.BENEFICIARIOS_URL + urls
+            cur_url = self.__BENEFICIARIOS_URL + urls
             print(cur_url)
             csv_path = download_and_extract_csv(cur_url)
             csv_paths.append(csv_path)
@@ -114,7 +114,7 @@ class Beneficiarios:
                                    representing each available monthly folder on the server.
         """
         # Fetching the page data
-        list_of_links = parse_url_links(self.BENEFICIARIOS_URL)
+        list_of_links = parse_url_links(self.__BENEFICIARIOS_URL)
 
         # Parsing and cleaning links
         list_of_dates = []
@@ -159,11 +159,3 @@ def concat_datasets(list_of_datasets):
             )
             first_chunk = False
 
-
-if __name__ == "__main__":
-    bf = Beneficiarios()
-    # print(bf.info)
-    # print(bf.date_range)
-    # bf.download_raw_data(["AC", "AM"], ["202401", "202404"])
-    # bf.build_dataset(states = ["AC", "AM"], start="202305", end="202412")
-    bf.build_dataset(states=["AC", "CE"], start="202401", end="202402")
