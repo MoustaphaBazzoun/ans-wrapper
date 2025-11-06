@@ -8,7 +8,7 @@ import requests
 from tqdm import tqdm
 
 
-def download_zip(url: str, output_dir="ans_downloads"):
+def download_zip(url: str, output_dir="ans_downloads") -> str:
     """
     Download a ZIP file from the web and save it locally in the specified folder.
 
@@ -42,7 +42,7 @@ def download_zip(url: str, output_dir="ans_downloads"):
     return filepath
 
 
-def extract_csv(zip_path, temp_extract_dir="ans_downloads"):
+def extract_csv(zip_path, temp_extract_dir="ans_downloads") -> str:
     """
     Extracts the first CSV file from a ZIP archive to a temporary directory.
 
@@ -65,6 +65,8 @@ def extract_csv(zip_path, temp_extract_dir="ans_downloads"):
 
         # There will be only one csv in the list, so we can get it with:
         csv_filename = csv_files[0]
+
+        # TODO: implement try-error here.
         zip_ref.extract(csv_filename, temp_extract_dir)
 
     extracted_csv_path = os.path.join(temp_extract_dir, csv_filename)
@@ -76,35 +78,7 @@ def extract_csv(zip_path, temp_extract_dir="ans_downloads"):
     return extracted_csv_path
 
 
-# NOTE: Not used anymore
-def move_and_cleanup(csv_path, final_dir="ans_datasets", cleanup_dirs=None):
-    """
-    Moves the CSV to a final directory and deletes any specified folders/files.
-
-    Returns:
-        str: Final path to the moved CSV file.
-    """
-    os.makedirs(final_dir, exist_ok=True)
-    final_csv_path = os.path.join(final_dir, os.path.basename(csv_path))
-    shutil.move(csv_path, final_csv_path)
-
-    if cleanup_dirs:
-        for path in cleanup_dirs:
-            if os.path.isfile(path):
-                os.remove(path)
-            elif os.path.isdir(path):
-                shutil.rmtree(path)
-
-    print(f"Final CSV location: {final_csv_path}")
-    return final_csv_path
-
-
 def download_and_extract_csv(url):
     zip_file_path = download_zip(url)
     csv_file_path = extract_csv(zip_file_path)
     return csv_file_path
-
-
-if __name__ == "__main__":
-    TEST_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/informacoes_consolidadas_de_beneficiarios-024/201909/pda-024-icb-AC-2019_09.zip"
-    download_and_extract_csv(TEST_URL)

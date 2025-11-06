@@ -1,3 +1,10 @@
+"""
+NOTE: Currently (11/2025) not being used.
+
+Provides a few enums to be used on the codebase. 
+"""
+
+
 from enum import Enum
 from typing import Literal
 
