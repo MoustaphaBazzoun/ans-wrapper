@@ -8,9 +8,8 @@ from typing import List, Literal, Union
 import pandas as pd
 import requests
 
-from .beneficiarios_utils import parse_url_links
-from ..download_utils import download_and_extract_csv
-from ..enums import BRAZILIAN_STATE_CODES, STATE_CODES
+from ans_wrapper.download_utils import parse_url_links, download_and_extract_csv
+from ans_wrapper.enums import BRAZILIAN_STATE_CODES, STATE_CODES
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 
@@ -23,21 +22,21 @@ class Beneficiarios:
     def __init__(self):
         self.available_months = self._fetch_available_months()
 
+
     @property
     def date_range(self):
         """Range of available data"""
         if not self.available_months:
             return "No data available"
 
-        start = datetime.strptime(self.available_months[0], "%Y%m").strftime(
-            "%b %Y"
-        )
+        start = (datetime.strptime(self.available_months[0], "%Y%m")
+                         .strftime("%b %Y"))
 
-        end = datetime.strptime(self.available_months[-1], "%Y%m").strftime(
-            "%b %Y"
-        )
+        end = (datetime.strptime(self.available_months[-1], "%Y%m")
+                       .strftime("%b %Y"))
 
         return f"data available from {start} to {end}"
+
 
     @property
     def info(self) -> str:
@@ -84,6 +83,7 @@ class Beneficiarios:
         print(csv_paths)
         print(dates, states)
 
+
     def download_raw_data(self, states: list, dates: list):
         """Download raw, unaltered datasets from the ANS server"""
         file_paths = []
@@ -104,6 +104,7 @@ class Beneficiarios:
             csv_paths.append(csv_path)
 
         return csv_paths
+
 
     def _fetch_available_months(self) -> List[str]:
         """
@@ -145,6 +146,9 @@ def generate_month_range(start: str, end: str) -> list[str]:
     return date_range
 
 
+# ------------------------------------------------------------------------------
+
+# Not Being Used
 def concat_datasets(list_of_datasets):
     output_file = "combined_dataset.csv"
     first_chunk = True  # Track if it's the first chunk being written

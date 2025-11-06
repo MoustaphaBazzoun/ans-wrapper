@@ -5,8 +5,8 @@ from the Brazilian National Health Agency (ANS).
 """
 
 # Import the main classes
-from .beneficiarios import Beneficiarios
-from .demonstracoes_contabeis import DemonstracoesContabeis
+from ans_wrapper.beneficiarios import Beneficiarios
+from ans_wrapper.demonstracoes_contabeis import DemonstracoesContabeis
 
 # Explicitly define what should be available for import
 __all__ = [

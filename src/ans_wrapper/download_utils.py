@@ -82,3 +82,20 @@ def download_and_extract_csv(url):
     zip_file_path = download_zip(url)
     csv_file_path = extract_csv(zip_file_path)
     return csv_file_path
+
+import requests
+from bs4 import BeautifulSoup
+
+
+def parse_url_links(url: str) -> list:
+    """Parse the paths of a given url"""
+    # This returns a html file inside a string
+    response = requests.get(url)
+
+    # Parsing the html
+    soup = BeautifulSoup(response.content, "html.parser")
+
+    # Parsing all the links
+    links = soup.find_all("a")
+
+    return links
