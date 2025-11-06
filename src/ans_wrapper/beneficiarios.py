@@ -3,10 +3,9 @@ Modulo de Beneficiários
 """
 
 from datetime import datetime
-from typing import List, Literal, Union
+from typing import List, Union
 
 import pandas as pd
-import requests
 
 from ans_wrapper.download_utils import parse_url_links, download_and_extract_csv
 from ans_wrapper.enums import BRAZILIAN_STATE_CODES, STATE_CODES
@@ -48,7 +47,8 @@ class Beneficiarios:
         )
 
 
-    # TODO: Work in Progress
+    # Main function of this class
+    # TODO: Work in Progress, concat can be more efficient
     def build_dataset(
         self,
         states: Union[STATE_CODES, List[STATE_CODES]],
@@ -57,12 +57,10 @@ class Beneficiarios:
         end=None,
     ) -> pd.DataFrame:
         """Create a dataset using customized configs."""
+        # 1. CHECKS ---------------
         # Checking date args
-        if target_date and (start or end):
-            raise ValueError(
-                "provide either `target_date` or both `start` and `end`, not both."
-            )
-        if not target_date and not (start and end):
+        if ((target_date and (start or end)) or 
+            (not target_date and not (start and end))):
             raise ValueError(
                 "provide either `target_date` or both `start` and `end`, not both."
             )
@@ -77,14 +75,23 @@ class Beneficiarios:
                     f"invalid state: {state}, allowed states are: {BRAZILIAN_STATE_CODES}"
                 )
 
-        dates = target_date if target_date else generate_month_range(start, end)
+        # Creating a list of dates
+        dates = [target_date] if target_date else generate_month_range(start, end)
 
-        csv_paths = self.download_raw_data(states, dates)
-        print(csv_paths)
+        # 2. DOWNLOADING ---------------
         print(dates, states)
+        csv_paths = self.download_raw_data(states, dates)
+        # combined_df_path = concat_datasets(csv_paths)
+        # df = pd.read_csv(combined_df_path, delimiter=";")
+        # print(df.head())
+        print(csv_paths)
+        concat_csv_files(
+            csv_paths=csv_paths,
+            output_path="combined.csv",
+        )
 
 
-    def download_raw_data(self, states: list, dates: list):
+    def download_raw_data(self, states: list, dates: list) -> str:
         """Download raw, unaltered datasets from the ANS server"""
         file_paths = []
         for state in states:
@@ -163,3 +170,35 @@ def concat_datasets(list_of_datasets):
             )
             first_chunk = False
 
+import pandas as pd
+
+def concat_csv_files(csv_paths, output_path, chunksize=100_000):
+    """
+    Concatenate multiple large CSV files with ';' as delimiter.
+    Works efficiently in chunks to avoid memory issues.
+    """
+    header_written = False
+
+    with open(output_path, "w", encoding="utf-8", newline="") as f_out:
+        for path in csv_paths:
+            try:
+                for chunk in pd.read_csv(
+                    path,
+                    sep=";",                # ✅ use semicolon
+                    chunksize=chunksize,     # ✅ read in small chunks
+                    low_memory=False,
+                    encoding="utf-8",
+                    on_bad_lines="skip"      # ✅ skip malformed rows
+                ):
+                    chunk.to_csv(
+                        f_out,
+                        sep=";",              # ✅ keep same delimiter
+                        index=False,
+                        header=not header_written,
+                        mode="a"
+                    )
+                    header_written = True
+            except Exception as e:
+                print(f"⚠️ Skipping {path} due to error: {e}")
+    
+    return str(output_path)
