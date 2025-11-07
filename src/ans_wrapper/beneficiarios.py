@@ -55,6 +55,9 @@ class Beneficiarios:
         target_date: str = None,
         start=None,
         end=None,
+        output_name="resulting_dataset",
+        in_chunks=False,
+        chunk_size=100_000
     ) -> pd.DataFrame:
         """Create a dataset using customized configs."""
         # 1. CHECKS ---------------
@@ -79,7 +82,6 @@ class Beneficiarios:
         dates = [target_date] if target_date else generate_month_range(start, end)
 
         # 2. DOWNLOADING ---------------
-        print(dates, states)
         csv_paths = self.download_raw_data(states, dates)
         # combined_df_path = concat_datasets(csv_paths)
         # df = pd.read_csv(combined_df_path, delimiter=";")
@@ -87,8 +89,16 @@ class Beneficiarios:
         print(csv_paths)
         concat_csv_files(
             csv_paths=csv_paths,
-            output_path="combined.csv",
+            output_path=output_name,
         )
+
+        if in_chunks:
+            return pd.read_csv(output_name, chunksize=chunk_size, delimiter=";") 
+        else:
+            return pd.read_csv(output_name, delimiter=";") 
+
+        
+
 
 
     def download_raw_data(self, states: list, dates: list) -> str:
