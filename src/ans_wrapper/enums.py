@@ -1,6 +1,4 @@
 """
-NOTE: Currently (11/2025) not being used.
-
 Provides a few enums to be used on the codebase. 
 """
 
@@ -100,10 +98,6 @@ class States(Enum):
     SP = ("São Paulo", "Sudeste")
     SE = ("Sergipe", "Nordeste")
     TO = ("Tocantins", "Norte")
-
-    def __init__(self, full_name, region):
-        self.full_name = full_name
-        self.region = region
 
 
 URL_BENEFICIARIOS = "https://dadosabertos.ans.gov.br/FTP/PDA/informacoes_consolidadas_de_beneficiarios-024/"

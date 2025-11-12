@@ -97,9 +97,6 @@ class Beneficiarios:
         else:
             return pd.read_csv(output_name, delimiter=";") 
 
-        
-
-
 
     def download_raw_data(self, states: list, dates: list) -> str:
         """Download raw, unaltered datasets from the ANS server"""

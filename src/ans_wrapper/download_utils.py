@@ -7,6 +7,13 @@ import zipfile
 import requests
 from tqdm import tqdm
 
+import requests
+from bs4 import BeautifulSoup
+
+
+class DownloadError(Exception):
+    pass
+
 
 def download_zip(url: str, output_dir="ans_downloads") -> str:
     """
@@ -82,9 +89,6 @@ def download_and_extract_csv(url):
     zip_file_path = download_zip(url)
     csv_file_path = extract_csv(zip_file_path)
     return csv_file_path
-
-import requests
-from bs4 import BeautifulSoup
 
 
 def parse_url_links(url: str) -> list:

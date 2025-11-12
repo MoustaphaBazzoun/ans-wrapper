@@ -9,7 +9,7 @@ from typing import List, Optional, Union
 
 import pandas as pd
 
-from ans_wrapper.download_utils import download_and_extract_csv
+from ans_wrapper.download_utils import download_and_extract_csv, DownloadError
 
 # Base URL for ANS open data portal
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
@@ -89,8 +89,7 @@ class DemonstracoesContabeis:
                 csv_path = download_and_extract_csv(request_url)
                 csv_paths.append(csv_path)
             except Exception as e:
-                print(f"Failed to download data for {quarter}: {e}") # NOTE: Maybe raise exception and interrupt function here...
-                continue
+                raise DownloadError(f"Failed to download data for {quarter}: {e}") # NOTE: Maybe raise exception and interrupt function here...
 
         if not csv_paths:
             raise ValueError(
