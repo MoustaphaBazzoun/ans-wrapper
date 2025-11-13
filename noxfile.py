@@ -37,10 +37,9 @@ def run_file(session):
 
 @nox.session
 def lint(session):
-    """Run flake8 and pylint to check code quality."""
-    session.install("flake8", "pylint")
-    session.run("flake8", "src", "tests", "noxfile.py")
-    session.run("pylint", "src", "tests")
+    """Run ruff to check code quality."""
+    session.install("ruff")
+    session.run("ruff", "check", "src", "--fix")
 
 
 @nox.session
@@ -53,14 +52,10 @@ def type_check(session):
 
 @nox.session
 def format(session):
-    """Format code using black and isort."""
-    session.install("black", "isort")
+    """Format code using ruff."""
+    session.install("ruff")
     session.log(f"Working dir: {os.getcwd()}")
-    session.run("isort", "src", "tests", "noxfile.py", external=True)
-    session.run(
-        "black", "--line-length=80", "src", "tests", "noxfile.py", external=True
-    )
-
+    session.run("ruff", "format", "src")
 
 @nox.session
 def check_formatting(session):

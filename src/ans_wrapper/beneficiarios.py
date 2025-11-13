@@ -68,7 +68,7 @@ class Beneficiarios:
             not target_date and not (start and end)
         ):
             raise ValueError(
-                f"provide either `target_date` or both `start` and `end`, not both."
+                "provide either `target_date` or both `start` and `end`, not both."
             )
 
         # checking states
