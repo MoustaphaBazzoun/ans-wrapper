@@ -36,8 +36,6 @@ BRAZILIAN_STATE_CODES = [
     "TO",  # Tocantins
 ]
 
-# TODO: Maybe use enum?
-# Type with all the Country's States
 STATE_CODES = Literal[
     "AC",
     "AL",
@@ -69,7 +67,6 @@ STATE_CODES = Literal[
 ]
 
 
-# TODO: Trying this new way of declaring constants, maybe I will change it
 class States(Enum):
     AC = ("Acre", "Norte")
     AL = ("Alagoas", "Nordeste")
