@@ -7,8 +7,11 @@ from typing import List, Union
 
 import pandas as pd
 
-from ans_wrapper.download_utils import parse_url_links, download_and_extract_csv
+from ans_wrapper.utils import parse_url_links, download_and_extract_csv
 from ans_wrapper.enums import BRAZILIAN_STATE_CODES, STATE_CODES
+
+from utils import generate_month_range, concat_csv_files
+
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 
@@ -47,18 +50,16 @@ class Beneficiarios:
         )
 
 
-    # Main function of this class
-    # TODO: Work in Progress, concat can be more efficient
     def build_dataset(
-        self,
-        states: Union[STATE_CODES, List[STATE_CODES]],
-        target_date: str = None,
-        start=None,
-        end=None,
-        output_name="resulting_dataset",
-        in_chunks=False,
-        chunk_size=100_000
-    ) -> pd.DataFrame:
+            self,
+            states: Union[STATE_CODES, List[STATE_CODES]],
+            target_date: str = None,
+            start=None,
+            end=None,
+            output_name="resulting_dataset",
+            in_chunks=False,
+            chunk_size=100_000
+            ) -> pd.DataFrame:
         """Create a dataset using customized configs."""
         # 1. CHECKS ---------------
         # Checking date args
@@ -83,10 +84,7 @@ class Beneficiarios:
 
         # 2. DOWNLOADING ---------------
         csv_paths = self.download_raw_data(states, dates)
-        # combined_df_path = concat_datasets(csv_paths)
-        # df = pd.read_csv(combined_df_path, delimiter=";")
-        # print(df.head())
-        print(csv_paths)
+
         concat_csv_files(
             csv_paths=csv_paths,
             output_path=output_name,
@@ -98,8 +96,27 @@ class Beneficiarios:
             return pd.read_csv(output_name, delimiter=";") 
 
 
-    def download_raw_data(self, states: list, dates: list) -> str:
-        """Download raw, unaltered datasets from the ANS server"""
+    def download_raw_data(
+            self,
+            states: STATE_CODES | list[STATE_CODES], 
+            dates: str | list[str]
+            ) -> str:
+        """
+        Download raw, unaltered datasets from the ANS server
+
+        Args:
+            states: A list of state codes.
+            dates: List of dates in the "YYYYMM" format.
+        
+        Returns:
+            str: The path to the downloaded csv files.
+        
+        """
+        # Checking argument types first
+        if isinstance(states, str): states = [states]
+        if isinstance(dates, str): dates = [dates]
+
+        # Forming urls
         file_paths = []
         for state in states:
             for date in dates:
@@ -110,6 +127,7 @@ class Beneficiarios:
                 cur_file_path = date + "/" + cur_file_name
                 file_paths.append(cur_file_path)
 
+        # Downloading CSVs
         csv_paths = []
         for urls in file_paths:
             cur_url = self.__BENEFICIARIOS_URL + urls
@@ -141,71 +159,3 @@ class Beneficiarios:
 
         return list_of_dates
 
-
-from dateutil.relativedelta import relativedelta
-
-
-def generate_month_range(start: str, end: str) -> list[str]:
-    """Generates a range of dates with monthly frequency."""
-    start_date = datetime.strptime(start, "%Y%m")
-    end_date = datetime.strptime(end, "%Y%m")
-
-    date_range = []
-    cur = start_date
-
-    while cur <= end_date:
-        date_range.append(cur.strftime("%Y%m"))
-        cur += relativedelta(months=1)
-
-    return date_range
-
-
-# ------------------------------------------------------------------------------
-
-# Not Being Used
-def concat_datasets(list_of_datasets):
-    output_file = "combined_dataset.csv"
-    first_chunk = True  # Track if it's the first chunk being written
-
-    for file_path in list_of_datasets:
-        print(f"Processing {file_path}...")
-
-        for chunk in pd.read_csv(file_path, chunksize=100_000):
-            mode = "w" if first_chunk else "a"
-            chunk.to_csv(
-                output_file, mode=mode, header=first_chunk, index=False
-            )
-            first_chunk = False
-
-import pandas as pd
-
-def concat_csv_files(csv_paths, output_path, chunksize=100_000):
-    """
-    Concatenate multiple large CSV files with ';' as delimiter.
-    Works efficiently in chunks to avoid memory issues.
-    """
-    header_written = False
-
-    with open(output_path, "w", encoding="utf-8", newline="") as f_out:
-        for path in csv_paths:
-            try:
-                for chunk in pd.read_csv(
-                    path,
-                    sep=";",                # ✅ use semicolon
-                    chunksize=chunksize,     # ✅ read in small chunks
-                    low_memory=False,
-                    encoding="utf-8",
-                    on_bad_lines="skip"      # ✅ skip malformed rows
-                ):
-                    chunk.to_csv(
-                        f_out,
-                        sep=";",              # ✅ keep same delimiter
-                        index=False,
-                        header=not header_written,
-                        mode="a"
-                    )
-                    header_written = True
-            except Exception as e:
-                print(f"⚠️ Skipping {path} due to error: {e}")
-    
-    return str(output_path)

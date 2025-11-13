@@ -8,14 +8,12 @@ from the Brazilian National Health Agency (ANS).
 from ans_wrapper.beneficiarios import Beneficiarios
 from ans_wrapper.demonstracoes_contabeis import DemonstracoesContabeis
 
-# Explicitly define what should be available for import
 __all__ = [
     "Beneficiarios",
     "DemonstracoesContabeis"
 ]
 
-# Type hints for better IDE support
-__version__: str = "0.1.1"
-__author__: str = "Mousta Bazzoun"
-__email__: str = "bazzounmousta@gmail.com"
+__version__ = "0.1.1"
+__author__ = "Mousta Bazzoun"
+__email__ = "bazzounmousta@gmail.com"
 

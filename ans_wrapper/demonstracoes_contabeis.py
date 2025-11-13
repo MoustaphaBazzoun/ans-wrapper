@@ -9,7 +9,7 @@ from typing import List, Optional, Union
 
 import pandas as pd
 
-from ans_wrapper.download_utils import download_and_extract_csv, DownloadError
+from ans_wrapper.utils import download_and_extract_csv, DownloadError
 
 # Base URL for ANS open data portal
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"

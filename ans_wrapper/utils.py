@@ -1,7 +1,6 @@
 """Collection of download utils to help download, extract and manipulate zip files and project folders"""
 
 import os
-import shutil
 import zipfile
 
 import requests
@@ -10,10 +9,17 @@ from tqdm import tqdm
 import requests
 from bs4 import BeautifulSoup
 
+import pandas as pd
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 
 class DownloadError(Exception):
     pass
 
+
+# Download Utils ----------
 
 def download_zip(url: str, output_dir="ans_downloads") -> str:
     """
@@ -103,3 +109,52 @@ def parse_url_links(url: str) -> list:
     links = soup.find_all("a")
 
     return links
+
+
+# General Utils ----------
+
+def generate_month_range(start: str, end: str) -> list[str]:
+    """Generates a range of dates with monthly frequency."""
+    start_date = datetime.strptime(start, "%Y%m")
+    end_date = datetime.strptime(end, "%Y%m")
+
+    date_range = []
+    cur = start_date
+
+    while cur <= end_date:
+        date_range.append(cur.strftime("%Y%m"))
+        cur += relativedelta(months=1)
+
+    return date_range
+
+
+def concat_csv_files(csv_paths, output_path, chunksize=100_000):
+    """
+    Concatenate multiple large CSV files with ';' as delimiter.
+    Works efficiently in chunks to avoid memory issues.
+    """
+    header_written = False
+
+    with open(output_path, "w", encoding="utf-8", newline="") as f_out:
+        for path in csv_paths:
+            try:
+                for chunk in pd.read_csv(
+                    path,
+                    sep=";",               
+                    chunksize=chunksize,   
+                    low_memory=False,
+                    encoding="utf-8",
+                    on_bad_lines="skip"      
+                ):
+                    chunk.to_csv(
+                        f_out,
+                        sep=";",              
+                        index=False,
+                        header=not header_written,
+                        mode="a"
+                    )
+                    header_written = True
+            except Exception as e:
+                print(f"Skipping {path} due to error: {e}")
+    
+    return str(output_path)
