@@ -25,7 +25,7 @@ def run_file(session):
     file_name = session.posargs[0] if session.posargs else None
     if not file_name:
         session.error(
-            "Please provide a file name to run: `nox -s run_file -- my_script.py`"
+            "Please provide a file name: `nox -s run_file -- my_script.py`"
         )
 
     # Run the file
@@ -47,7 +47,8 @@ def lint(session):
 def type_check(session):
     """Run mypy to check for type errors."""
     session.install("mypy")
-    session.run("mypy", "src", "tests")
+    session.run("mypy", "--install-types", "--non-interactive")
+    session.run("mypy", "src")
 
 
 @nox.session

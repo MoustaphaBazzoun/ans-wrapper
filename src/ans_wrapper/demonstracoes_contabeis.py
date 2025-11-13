@@ -9,7 +9,7 @@ from typing import List, Optional, Union
 
 import pandas as pd
 
-from ans_wrapper.utils import download_and_extract_csv, DownloadError
+from ans_wrapper.utils import DownloadError, download_and_extract_csv
 
 # Base URL for ANS open data portal
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
@@ -45,7 +45,7 @@ class DemonstracoesContabeis:
             quarters: Quarter(s) in format "1T2024", "2T2023", etc. Can be a single
                      string or a list of strings.
             company: ANS code(s) to filter by. Can be a single code (str/int) or a
-                    list of codes. If None, returns the full dataset for all companies.
+                    list of codes. If None, returns the full dataset.
 
         Returns:
             pd.DataFrame: Filtered financial data with columns including REG_ANS
@@ -76,11 +76,12 @@ class DemonstracoesContabeis:
             # Extract year and quarter number from format like "1T2024"
             if "T" not in quarter:
                 raise ValueError(
-                    f"Invalid quarter format: {quarter}. Expected format: '1T2024'"
+                    f"Invalid quarter format: {quarter}."
+                    f"Expected format: '1T2024'"
                 )
 
             quarter_num, year = quarter.split("T")
-            filename = self.FILENAME.format(quarter=quarter_num, year=year) 
+            filename = self.FILENAME.format(quarter=quarter_num, year=year)
             request_url = (
                 self.DEM_CONTABEIS_ENDPOINT + str(year) + "/" + filename
             )
@@ -89,7 +90,9 @@ class DemonstracoesContabeis:
                 csv_path = download_and_extract_csv(request_url)
                 csv_paths.append(csv_path)
             except Exception as e:
-                raise DownloadError(f"Failed to download data for {quarter}: {e}") # NOTE: Maybe raise exception and interrupt function here...
+                raise DownloadError(
+                    f"Failed to download data for {quarter}: {e}"
+                )
 
         if not csv_paths:
             raise ValueError(
@@ -140,4 +143,3 @@ class DemonstracoesContabeis:
             return filtered_df
 
         return combined_df
-

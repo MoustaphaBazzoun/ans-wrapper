@@ -1,7 +1,6 @@
 """
-Provides a few enums to be used on the codebase. 
+Provides a few enums to be used on the codebase.
 """
-
 
 from enum import Enum
 from typing import Literal
@@ -97,6 +96,9 @@ class States(Enum):
     TO = ("Tocantins", "Norte")
 
 
-URL_BENEFICIARIOS = "https://dadosabertos.ans.gov.br/FTP/PDA/informacoes_consolidadas_de_beneficiarios-024/"
+URL_BENEFICIARIOS = (
+    "https://dadosabertos.ans.gov.br/FTP/PDA/"
+    "informacoes_consolidadas_de_beneficiarios-024/"
+)
 
 URL = "https://dadosabertos.ans.gov.br/FTP/"

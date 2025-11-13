@@ -1,18 +1,17 @@
-"""Collection of download utils to help download, extract and manipulate zip files and project folders"""
+"""
+Collection of download utils to help download,
+extract and manipulate zip files and project folders
+"""
 
 import os
 import zipfile
-
-import requests
-from tqdm import tqdm
-
-import requests
-from bs4 import BeautifulSoup
+from datetime import datetime
 
 import pandas as pd
-
-from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
+from tqdm import tqdm
 
 
 class DownloadError(Exception):
@@ -20,6 +19,7 @@ class DownloadError(Exception):
 
 
 # Download Utils ----------
+
 
 def download_zip(url: str, output_dir="ans_downloads") -> str:
     """
@@ -113,6 +113,7 @@ def parse_url_links(url: str) -> list:
 
 # General Utils ----------
 
+
 def generate_month_range(start: str, end: str) -> list[str]:
     """Generates a range of dates with monthly frequency."""
     start_date = datetime.strptime(start, "%Y%m")
@@ -140,21 +141,21 @@ def concat_csv_files(csv_paths, output_path, chunksize=100_000):
             try:
                 for chunk in pd.read_csv(
                     path,
-                    sep=";",               
-                    chunksize=chunksize,   
+                    sep=";",
+                    chunksize=chunksize,
                     low_memory=False,
                     encoding="utf-8",
-                    on_bad_lines="skip"      
+                    on_bad_lines="skip",
                 ):
                     chunk.to_csv(
                         f_out,
-                        sep=";",              
+                        sep=";",
                         index=False,
                         header=not header_written,
-                        mode="a"
+                        mode="a",
                     )
                     header_written = True
             except Exception as e:
                 print(f"Skipping {path} due to error: {e}")
-    
+
     return str(output_path)

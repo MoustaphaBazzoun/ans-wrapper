@@ -7,11 +7,13 @@ from typing import List, Union
 
 import pandas as pd
 
-from ans_wrapper.utils import parse_url_links, download_and_extract_csv
 from ans_wrapper.enums import BRAZILIAN_STATE_CODES, STATE_CODES
-
-from utils import generate_month_range, concat_csv_files
-
+from ans_wrapper.utils import (
+    concat_csv_files,
+    download_and_extract_csv,
+    generate_month_range,
+    parse_url_links,
+)
 
 BASE_URL = "https://dadosabertos.ans.gov.br/FTP/PDA/"
 
@@ -24,21 +26,21 @@ class Beneficiarios:
     def __init__(self):
         self.available_months = self._fetch_available_months()
 
-
     @property
     def date_range(self):
         """Range of available data"""
         if not self.available_months:
             return "No data available"
 
-        start = (datetime.strptime(self.available_months[0], "%Y%m")
-                         .strftime("%b %Y"))
+        start = datetime.strptime(self.available_months[0], "%Y%m").strftime(
+            "%b %Y"
+        )
 
-        end = (datetime.strptime(self.available_months[-1], "%Y%m")
-                       .strftime("%b %Y"))
+        end = datetime.strptime(self.available_months[-1], "%Y%m").strftime(
+            "%b %Y"
+        )
 
         return f"data available from {start} to {end}"
-
 
     @property
     def info(self) -> str:
@@ -49,24 +51,24 @@ class Beneficiarios:
             f"🔗 Source: {self.__BENEFICIARIOS_URL}"
         )
 
-
     def build_dataset(
-            self,
-            states: Union[STATE_CODES, List[STATE_CODES]],
-            target_date: str = None,
-            start=None,
-            end=None,
-            output_name="resulting_dataset",
-            in_chunks=False,
-            chunk_size=100_000
-            ) -> pd.DataFrame:
+        self,
+        states: Union[STATE_CODES, List[STATE_CODES]],
+        target_date: str = None,
+        start=None,
+        end=None,
+        output_name="resulting_dataset",
+        in_chunks=False,
+        chunk_size=100_000,
+    ) -> pd.DataFrame:
         """Create a dataset using customized configs."""
         # 1. CHECKS ---------------
         # Checking date args
-        if ((target_date and (start or end)) or 
-            (not target_date and not (start and end))):
+        if (target_date and (start or end)) or (
+            not target_date and not (start and end)
+        ):
             raise ValueError(
-                "provide either `target_date` or both `start` and `end`, not both."
+                f"provide either `target_date` or both `start` and `end`, not both."
             )
 
         # checking states
@@ -76,11 +78,13 @@ class Beneficiarios:
         for state in states:
             if state not in BRAZILIAN_STATE_CODES:
                 raise ValueError(
-                    f"invalid state: {state}, allowed states are: {BRAZILIAN_STATE_CODES}"
+                    f"invalid state: {state}, allowed states: {BRAZILIAN_STATE_CODES}"
                 )
 
         # Creating a list of dates
-        dates = [target_date] if target_date else generate_month_range(start, end)
+        dates = (
+            [target_date] if target_date else generate_month_range(start, end)
+        )
 
         # 2. DOWNLOADING ---------------
         csv_paths = self.download_raw_data(states, dates)
@@ -91,30 +95,29 @@ class Beneficiarios:
         )
 
         if in_chunks:
-            return pd.read_csv(output_name, chunksize=chunk_size, delimiter=";") 
+            return pd.read_csv(output_name, chunksize=chunk_size, delimiter=";")
         else:
-            return pd.read_csv(output_name, delimiter=";") 
-
+            return pd.read_csv(output_name, delimiter=";")
 
     def download_raw_data(
-            self,
-            states: STATE_CODES | list[STATE_CODES], 
-            dates: str | list[str]
-            ) -> str:
+        self, states: STATE_CODES | list[STATE_CODES], dates: str | list[str]
+    ) -> str:
         """
         Download raw, unaltered datasets from the ANS server
 
         Args:
             states: A list of state codes.
             dates: List of dates in the "YYYYMM" format.
-        
+
         Returns:
             str: The path to the downloaded csv files.
-        
+
         """
         # Checking argument types first
-        if isinstance(states, str): states = [states]
-        if isinstance(dates, str): dates = [dates]
+        if isinstance(states, str):
+            states = [states]
+        if isinstance(dates, str):
+            dates = [dates]
 
         # Forming urls
         file_paths = []
@@ -137,7 +140,6 @@ class Beneficiarios:
 
         return csv_paths
 
-
     def _fetch_available_months(self) -> List[str]:
         """
         Fetches the list of available months from the beneficiários folder.
@@ -158,4 +160,3 @@ class Beneficiarios:
                 list_of_dates.append(href.strip("/"))
 
         return list_of_dates
-
