@@ -24,9 +24,7 @@ def run_file(session):
     # Get the file name, if provided, else raise error
     file_name = session.posargs[0] if session.posargs else None
     if not file_name:
-        session.error(
-            "Please provide a file name: `nox -s run_file -- my_script.py`"
-        )
+        session.error("Please provide a file name: `nox -s run_file -- my_script.py`")
 
     # Run the file
     session.run("python3", f"tests/{file_name}")
@@ -56,6 +54,14 @@ def format(session):
     session.install("ruff")
     session.log(f"Working dir: {os.getcwd()}")
     session.run("ruff", "format", "src")
+
+@nox.session
+def format_test(session):
+    """Format code using ruff."""
+    session.install("ruff")
+    session.log(f"Working dir: {os.getcwd()}")
+    session.run("ruff", "format", "test.py")
+
 
 @nox.session
 def check_formatting(session):

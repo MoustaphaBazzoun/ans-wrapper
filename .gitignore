@@ -219,3 +219,4 @@ _old/
 
 # IDE stuff
 .idea/
+.DS_Store
